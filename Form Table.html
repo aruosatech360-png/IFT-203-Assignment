@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Table</title>
+    <script>
+        function showSummary(formData) {
+            const summaryContent = document.getElementById('summaryContent');
+            if (!summaryContent) return;
+            
+            const courseSelect = document.getElementById('favCourse');
+            let courseText = "N/A";
+            if (courseSelect.selectedIndex > 0) {
+                courseText = courseSelect.options[courseSelect.selectedIndex].text;
+            }
+            
+            const html = `
+                <p><strong>Name:</strong> ${formData.name}</p>
+                <p><strong>Matric No:</strong> ${formData.matricNo}</p>
+                <p><strong>Gender:</strong> ${formData.gender}</p>
+                <p><strong>State of Origin:</strong> ${formData.state}</p>
+                <p><strong>Department:</strong> ${formData.department}</p>
+                <p><strong>Favourite Course:</strong> ${courseText}</p>
+            `;
+            
+            summaryContent.innerHTML = html;
+        }
+
+        function validateForm() {
+            const form = document.forms[0];
+            const name = form.name.value.trim();
+            const matricNo = form.matricNo.value.trim();
+            const gender = form.gender.value;
+            const state = form.stateOfOrigin.value;
+            const department = form.department.value.trim();
+            const favCourse = form.favouriteCourse.value;
+            
+            const errorEl = document.getElementById('errorMsg');
+            const successEl = document.getElementById('successMsg');
+            const loadingEl = document.getElementById('loadingMsg');
+            const summaryEl = document.getElementById('dataSummary');
+
+            const nameRegex = /^[A-Za-z ]{3,40}$/; // allow spaces, more reasonable length
+            const matricNoRegex = /^RUN\/([A-Z]{3})\/([0-9]{2})\/([0-9]{5})$/;
+            const genderOptions = ['Male', 'Female'];
+
+            // reset messages
+            if (errorEl) {
+                errorEl.style.display = 'none';
+                errorEl.textContent = '';
+            }
+            if (successEl) {
+                successEl.style.display = 'none';
+                successEl.textContent = '';
+            }
+
+            if (!nameRegex.test(name) || !matricNoRegex.test(matricNo) || 
+                !genderOptions.includes(gender) || !favCourse || 
+                !state || !department) {
+                if (errorEl) {
+                    // hide other elements
+                    if (loadingEl) loadingEl.style.display = 'none';
+                    if (summaryEl) summaryEl.style.display = 'none';
+                    if (successEl) { successEl.style.display = 'none'; successEl.textContent = ''; }
+                    
+                    // show specific error
+                    if (!nameRegex.test(name)) {
+                        errorEl.textContent = 'Name is incomplete or invalid.';
+                    } else if (!matricNoRegex.test(matricNo)) {
+                        errorEl.textContent = 'Matric No. is incorrect.';
+                    } else if (!gender) {
+                        errorEl.textContent = 'Please select your gender.';
+                    } else if (!state) {
+                        errorEl.textContent = 'Please select your state of origin.';
+                    } else if (!department) {
+                        errorEl.textContent = 'Department is required.';
+                    } else if (!favCourse) {
+                        errorEl.textContent = 'Please select a favourite course.';
+                    } else {
+                        errorEl.textContent = 'Incomplete or incorrect data';
+                    }
+                    errorEl.style.display = 'block';
+                } else {
+                    alert('Incomplete or incorrect data');
+                }
+                return false;
+            }
+
+            // success: show loading animation, then display summary of inputs
+            if (errorEl) { errorEl.style.display = 'none'; errorEl.textContent = ''; }
+            if (successEl) { successEl.style.display = 'none'; successEl.textContent = ''; }
+
+            // show loading
+            if (loadingEl) loadingEl.style.display = 'block';
+
+            // disable submit button while loading
+            const submitBtn = form.querySelector('input[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            // gather data to show later
+            const formData = {
+                name: name,
+                matricNo: matricNo,
+                gender: gender,
+                state: state,
+                department: department, // Corrected from 'Department'
+                favouriteCourse: favCourse
+            };
+
+            // simulate processing time then show summary
+            setTimeout(function () {
+                if (loadingEl) loadingEl.style.display = 'none';
+                // populate and show summary
+                showSummary(formData);
+                const summaryElShown = document.getElementById('dataSummary');
+                if (summaryElShown) summaryElShown.style.display = 'block';
+                // show success message
+                if (successEl) {
+                    successEl.textContent = 'Data input correctly.';
+                    successEl.style.display = 'block';
+                }
+                // re-enable submit button
+                if (submitBtn) submitBtn.disabled = false;
+            }, 1200);
+
+            // prevent actual form submission (we show summary client-side)
+            return false;
+        }
+    </script>
+</head>
+<body>
+    <p style="margin:0.8rem 0 0.2rem 0;"><a href="IFTAssignment.html" style="text-decoration:none;color:#0b74de;font-weight:600;">&larr; Home</a></p>
+    <form onsubmit="return validateForm()">
+        <table>
+            <tr>
+                <th>Name (Surname First)</th>
+                <td><input type="text" name="name"></td>
+            </tr>
+            <tr>
+                <th>Matric No.</th>
+                <td><input type="text" name="matricNo" placeholder="e.g., RUN/IFT/22/12345"></td>
+            </tr>
+            <tr>
+                <th>Gender</th>
+                <td>
+                    <select name="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>State of origin</th>
+                <td>
+                        <select name="State of origin">
+                            <option value="">Select State</option>
+                            <option value="Abia">Abia</option>
+                            <option value="Adamawa">Adamawa</option>
+                            <option value="Akwa Ibom">Akwa Ibom</option>
+                            <option value="Anambra">Anambra</option>
+                            <option value="Bauchi">Bauchi</option>
+                            <option value="Bayelsa">Bayelsa</option>
+                            <option value="Benue">Benue</option>
+                            <option value="Borno">Borno</option>
+                            <option value="Cross River">Cross River</option>
+                            <option value="Delta">Delta</option>
+                            <option value="Ebonyi">Ebonyi</option>
+                            <option value="Edo">Edo</option>
+                            <option value="Ekiti">Ekiti</option>
+                            <option value="Enugu">Enugu</option>
+                            <option value="Gombe">Gombe</option>
+                            <option value="Imo">Imo</option>
+                            <option value="Jigawa">Jigawa</option>
+                            <option value="Kaduna">Kaduna</option>
+                            <option value="Kano">Kano</option>
+                            <option value="Kogi">Kogi</option>
+                            <option value="Kwara">Kwara</option>
+                            <option value="Lagos">Lagos</option>
+                            <option value="Nasarawa">Nasarawa</option>
+                            <option value="Niger">Niger</option>
+                            <option value="Ogun">Ogun</option>
+                            <option value="Ondo">Ondo</option>
+                            <option value="Osun">Osun</option>
+                            <option value="Oyo">Oyo</option>
+                            <option value="Plateau">Plateau</option>
+                            <option value="Rivers">Rivers</option>
+                            <option value="Sokoto">Sokoto</option>
+                            <option value="Taraba">Taraba</option>
+                            <option value="Yobe">Yobe</option>
+                            <option value="Zamfara">Zamfara</option>
+                        </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Department</th>
+                <td><input type="text" name="department"></td>
+            </tr>
+            <tr>
+                <th>Favourite Course</th>
+                <td>
+                    <select name="favouriteCourse" id="favCourse" style="width:260px;padding:6px;border:1px solid #ccc;border-radius:4px;">
+                        <option value="">Select a Course</option>
+                        <option value="COS 201">COS 201 - Computer Programming I</option>
+                        <option value="CYB 201">CYB 201 - Introduction to Cybersecurity and Strategy</option>
+                        <option value="ENT 211">ENT 211 - Entrepreneurship and Innovation</option>
+                        <option value="IFT 203">IFT 203 - Introduction to Web Technologies</option>
+                        <option value="IFT 205">IFT 205 - Introduction to Information Technology</option>
+                        <option value="IFT 211">IFT 211 - Digital Logic Design</option>
+                        <option value="MTH 201">MTH 201 - Mathematical Methods</option>
+                        <option value="GIT 213">GIT 213 - Introduction to Machine Learning I</option>
+                        <option value="FIC 201">FIC 201 - Christian Worldview and Contemporary Culture</option>
+                        <option value="ICT 201">ICT 201 - Introduction to Information and Communication Technology</option>
+                        <option value="IFS 207">IFS 207 - Introduction to Information Systems</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="Submit"></td>
+            </tr>
+        </table>
+    </form>
+    <!-- Loading animation -->
+    <div id="loadingMsg" style="display:none;text-align:center;margin-top:20px;">
+        <div class="spinner" style="display:inline-block;width:30px;height:30px;border:3px solid #f3f3f3;border-top:3px solid #3498db;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <div style="margin-top:10px;color:#666;">Processing...</div>
+    </div>
+    <!-- Summary of input data -->
+    <div id="dataSummary" style="display:none;margin-top:20px;padding:20px;background:#f8f9fa;border-radius:8px;">
+        <h3 style="margin:0 0 15px;color:#2c3e50;">Submitted Information</h3>
+        <div id="summaryContent" style="line-height:1.6;"></div>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <div id="successMsg" style="display:none;color:#187f2e;margin-top:12px;font-weight:bold;"></div>
+    <div id="errorMsg" style="display:none;color:#b00020;margin-top:12px;font-weight:bold;"></div>
+</body>
+</html>
